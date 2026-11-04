@@ -5,8 +5,6 @@
 \title{Scrape Multiple Weeks of Data}
 \usage{
 scrape_multiple_weeks(start_date, end_date)
-
-scrape_multiple_weeks(start_date, end_date)
 }
 \arguments{
 \item{start_date}{String. Start date (YYYY-MM-DD).}
@@ -15,11 +13,7 @@ scrape_multiple_weeks(start_date, end_date)
 }
 \value{
 A combined dataframe of all weeks.
-
-A combined dataframe of all weeks.
 }
 \description{
-Scrape Multiple Weeks of Data
-
 Scrape Multiple Weeks of Data
 }

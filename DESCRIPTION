@@ -17,3 +17,15 @@ LazyData: true
 URL: https://github.com/peteowen1/netflix
 BugReports: https://github.com/peteowen1/netflix/issues
 RoxygenNote: 7.3.3
+Imports:
+    utils,
+    dplyr,
+    janitor,
+    lubridate,
+    magrittr,
+    purrr,
+    readxl,
+    rvest,
+    stringr
+Suggests:
+    devtools
