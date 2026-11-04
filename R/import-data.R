@@ -2,6 +2,10 @@
 #'
 #' @param file_path String. Local path to 'all-weeks-global.xlsx' OR a direct URL.
 #' @return A cleaned dataframe ready for analysis.
+#' @importFrom readxl read_excel
+#' @importFrom dplyr mutate rename_with any_of
+#' @importFrom janitor clean_names
+#' @export
 import_netflix_excel <- function(file_path) {
 
   # 1. Handle URL downloads if necessary
@@ -32,9 +36,12 @@ import_netflix_excel <- function(file_path) {
     mutate(
       week = as.Date(week),
       weekly_rank = as.integer(weekly_rank),
-      # Use checking to avoid errors if columns are missing
-      weeks_in_top_10 = if("weeks_in_top_10" %in% names(.)) as.integer(weeks_in_top_10) else NA,
-      hours_viewed = if("hours_viewed" %in% names(.)) as.numeric(hours_viewed) else NA
+      # Use safe checking to avoid errors if columns are missing
+      weeks_in_top_10 = if("weeks_in_top_10" %in% names(.)) as.integer(weeks_in_top_10) else NA_integer_,
+      hours_viewed = if("hours_viewed" %in% names(.)) as.numeric(hours_viewed) else NA_real_,
+      # Also handle other numeric columns that might exist
+      runtime = if("runtime" %in% names(.)) as.numeric(runtime) else NA_real_,
+      weekly_views = if("weekly_views" %in% names(.)) as.numeric(weekly_views) else NA_real_
     )
 
   return(cleaned_data)
