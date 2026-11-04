@@ -62,9 +62,6 @@ Both methods normalize to a common schema during data cleaning using `rename_wit
   - Normalizes column names for consistency
   - Handles both date formats and numeric conversions
 
-**R/hello.R**
-- Leftover usethis boilerplate (`hello()` stub) — safe to delete.
-
 **R/scrape-data.R**
 - `get_netflix_weekly_data(week_date)`: Scrapes single week across 4 categories
   - Categories: Films (English), Films (Non-English), TV (English), TV (Non-English)

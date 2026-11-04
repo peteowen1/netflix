@@ -2,3 +2,6 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^\.github$
+^CLAUDE\.md$
+^analysis\.R$
+^test-scraper\.R$

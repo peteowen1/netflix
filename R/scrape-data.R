@@ -3,7 +3,8 @@
 #' @param week_date String or Date. The Sunday ending the week (Format: "YYYY-MM-DD").
 #' @return A dataframe containing the Top 10 for all 4 categories.
 #' @importFrom rvest read_html html_element html_table
-#' @importFrom dplyr mutate bind_rows select any_of
+#' @importFrom dplyr mutate bind_rows select rename across any_of
+#' @importFrom stringr str_extract str_remove
 #' @importFrom janitor clean_names
 #' @export
 get_netflix_weekly_data <- function(week_date) {
@@ -59,8 +60,8 @@ get_netflix_weekly_data <- function(week_date) {
         # We use mutate combined with across for efficiency
         df <- df %>%
           mutate(
-            across(c(weekly_views, hours_viewed), ~ as.numeric(gsub(",", "", .x))),
-            weeks_in_top_10 = as.integer(weeks_in_top_10)
+            across(any_of(c("weekly_views", "hours_viewed")), ~ as.numeric(gsub(",", "", .x))),
+            across(any_of("weeks_in_top_10"), as.integer)
           )
 
         # 5. Fix Runtime (Convert "1:32" to 1.53 decimal hours)
