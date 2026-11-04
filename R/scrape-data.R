@@ -82,10 +82,7 @@ get_netflix_weekly_data <- function(week_date) {
         is_tv <- startsWith(slug, "tv")
         if (is_tv) {
           df$season_title <- df$show_title
-          df$show_title <- str_remove(
-            df$show_title,
-            ":\\s*(Season \\d+|Part \\d+|Volume \\d+|Book \\d+|Chapter \\d+|Limited Series)$"
-          )
+          df$show_title <- strip_season_label(df$show_title)
         } else {
           df$season_title <- "N/A"
         }
@@ -107,6 +104,30 @@ get_netflix_weekly_data <- function(week_date) {
   }
 
   bind_rows(all_data)
+}
+
+#' Bare show name from a full TV season name
+#'
+#' Removes a trailing season label the way Netflix's Excel file splits
+#' `season_title` ("Lupin: Part 4") into `show_title` ("Lupin"): a labelled
+#' sub-season first ("Love Is Blind: S10: Ohio"), then one trailing label
+#' (Season N, Limited Series, Part N, a dated episode, Roman numerals, ...).
+#' A name without a recognised label (a one-off special such as "Jo Koy: Blue
+#' in the Face") is left whole. Against every TV row in the Excel file
+#' (4 Nov 2026), it reproduces `show_title` for 1,765 of 1,800.
+#'
+#' @param x Character vector of full names.
+#' @return Character vector of show names.
+#' @noRd
+strip_season_label <- function(x) {
+  months <- "(January|February|March|April|May|June|July|August|September|October|November|December)"
+  label <- paste0(
+    "(Season \\d+|Limited Series|Part \\d+|Volume \\d+|Book \\d+|Chapter \\d+|",
+    "Collection \\d+|Class \\d+|S\\d+|[IVX]+|(\\d{4} - )?", months, " \\d{1,2}, \\d{4}|",
+    "\uc2dc\uc98c \\d+)"   # Korean "season N"
+  )
+  x <- sub(": (S\\d+|Season \\d+): [^:]*$", "", x)
+  sub(paste0(": ", label, "$"), "", x)
 }
 
 #' Scrape Multiple Weeks of Data
