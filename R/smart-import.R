@@ -121,6 +121,16 @@ import_netflix_smart <- function(file_path, check_latest = TRUE) {
           mutate(weekly_views = as.numeric(weekly_views))
       }
 
+      # Use the Excel's show_title for seasons it already knows, so a show
+      # keeps one key across the Excel/scraped boundary
+      if (all(c("show_title", "season_title") %in% names(excel_data))) {
+        known <- unique(excel_data[excel_data$season_title != "N/A",
+                                   c("season_title", "show_title")])
+        known <- known[!duplicated(known$season_title), ]
+        hit <- match(scraped_data$season_title, known$season_title)
+        scraped_data$show_title[!is.na(hit)] <- known$show_title[hit[!is.na(hit)]]
+      }
+
       # Combine datasets
       combined_data <- bind_rows(excel_data, scraped_data)
 

@@ -50,8 +50,11 @@ get_netflix_weekly_data <- function(week_date) {
         if ("ranking" %in% names(df)) {
           df <- df %>%
             mutate(
-              weekly_rank = as.integer(str_extract(ranking, "^\\d+")),
-              show_title = str_remove(ranking, "^\\d+")
+              # The cell is a two-digit rank glued to the title ("01Animals",
+              # "051923"), so take exactly two digits: a greedy \\d+ eats
+              # titles that start with a number.
+              weekly_rank = as.integer(str_extract(ranking, "^\\d{2}")),
+              show_title = str_remove(ranking, "^\\d{2}")
             ) %>%
             select(-ranking)
         }
@@ -71,14 +74,26 @@ get_netflix_weekly_data <- function(week_date) {
           })
         }
 
-        # 6. Add Metadata and ensure missing columns exist
+        # 6. Match the Excel title columns: there, TV season_title is the full
+        # name ("Lupin: Part 4") and show_title the bare show ("Lupin"); films
+        # have season_title "N/A". The page shows only the full name, so strip
+        # a trailing season label here; import_netflix_smart() then prefers the
+        # Excel's own show_title for any season_title it already knows.
+        is_tv <- startsWith(slug, "tv")
+        if (is_tv) {
+          df$season_title <- df$show_title
+          df$show_title <- str_remove(
+            df$show_title,
+            ":\\s*(Season \\d+|Part \\d+|Volume \\d+|Book \\d+|Chapter \\d+|Limited Series)$"
+          )
+        } else {
+          df$season_title <- "N/A"
+        }
+
         df <- df %>%
           mutate(
             category = categories[slug],
-            week = as.Date(week_str),
-            # Ensure these exist so bind_rows doesn't fail later
-            season_title = if("season_title" %in% names(.)) season_title else NA_character_,
-            views_in_millions = NA_real_ # Keeping as NA to match your target snippet
+            week = as.Date(week_str)
           )
 
         all_data[[slug]] <- df
